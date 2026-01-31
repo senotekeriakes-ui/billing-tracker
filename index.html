@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #ffffff;
+            padding: 20px;
+            color: #37352f;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: #37352f;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: #787774;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 18px;
+            border-radius: 8px;
+            color: white;
+            text-align: center;
+        }
+
+        .stat-card.green {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .stat-card.blue {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .stat-card .label {
+            font-size: 11px;
+            opacity: 0.9;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .stat-card .sub {
+            font-size: 11px;
+            opacity: 0.85;
+        }
+
+        .input-section {
+            background: #f7f6f3;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 140px 1fr 140px auto;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #37352f;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e3e2e0;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .day-indicator {
+            padding: 10px 12px;
+            background: white;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #e3e2e0;
+        }
+
+        .day-indicator.thursday {
+            background: #fef3c7;
+            border-color: #fcd34d;
+        }
+
+        .day-name {
+            font-size: 11px;
+            color: #787774;
+            margin-bottom: 2px;
+        }
+
+        .commission-preview {
+            font-size: 16px;
+            font-weight: 600;
+            color: #10b981;
+        }
+
+        .commission-rate {
+            font-size: 10px;
+            color: #787774;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .entries-section {
+            background: #f7f6f3;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .section-header {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #37352f;
+        }
+
+        .entry-item {
+            display: grid;
+            grid-template-columns: 100px 1fr auto auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            border-left: 3px solid #e3e2e0;
+        }
+
+        .entry-item.thursday {
+            border-left-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .entry-date {
+            font-size: 12px;
+            color: #37352f;
+        }
+
+        .entry-day {
+            font-size: 10px;
+            color: #787774;
+        }
+
+        .entry-production {
+            font-size: 15px;
+            font-weight: 600;
+            color: #10b981;
+        }
+
+        .entry-commission {
+            font-size: 11px;
+            color: #787774;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #787774;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+
+            .entry-item {
+                grid-template-columns: 1fr auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Billing Tracker</h1>
+            <p>Track daily production with automatic commission calculation</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card green">
+                <div class="label">Today</div>
+                <div class="value" id="todayTotal">$0</div>
+                <div class="sub" id="todayCommission">$0 comm.</div>
+            </div>
+            <div class="stat-card blue">
+                <div class="label">This Week</div>
+                <div class="value" id="weekTotal">$0</div>
+                <div class="sub" id="weekCommission">$0 comm.</div>
+            </div>
+            <div class="stat-card">
+                <div class="label">This Month</div>
+                <div class="value" id="monthTotal">$0</div>
+                <div class="sub" id="monthCommission">$0 comm.</div>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="input-section">
+            <div class="input-row">
+                <div class="input-group">
+                    <label>Date</label>
+                    <input type="date" id="entryDate">
+                </div>
+                
+                <div class="input-group">
+                    <label>Production Amount ($)</label>
+                    <input type="number" id="productionAmount" placeholder="0.00" step="0.01" min="0">
+                </div>
+                
+                <div class="input-group">
+                    <label>Commission</label>
+                    <div class="day-indicator" id="dayIndicator">
+                        <div class="day-name" id="dayName">Monday</div>
+                        <div class="commission-preview" id="commissionPreview">$0</div>
+                        <div class="commission-rate" id="rateDisplay">36%</div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>&nbsp;</label>
+                    <button class="btn" onclick="addEntry()">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Entries -->
+        <div class="entries-section">
+            <div class="section-header">Recent Entries</div>
+            <div id="entriesList">
+                <div class="empty-state">No entries yet. Add your first production entry above!</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize
+        let entries = JSON.parse(localStorage.getItem('billingEntries') || '[]');
+        
+        document.getElementById('entryDate').valueAsDate = new Date();
+        updateDayInfo();
+        updateStats();
+        renderEntries();
+
+        document.getElementById('entryDate').addEventListener('change', updateDayInfo);
+        document.getElementById('productionAmount').addEventListener('input', calculateCommission);
+
+        function updateDayInfo() {
+            const dateInput = document.getElementById('entryDate');
+            const date = new Date(dateInput.value + 'T00:00:00');
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const dayName = days[date.getDay()];
+            const isThursday = date.getDay() === 4;
+            
+            document.getElementById('dayName').textContent = dayName;
+            
+            const indicator = document.getElementById('dayIndicator');
+            if (isThursday) {
+                indicator.classList.add('thursday');
+            } else {
+                indicator.classList.remove('thursday');
+            }
+            
+            calculateCommission();
+        }
+
+        function calculateCommission() {
+            const amount = parseFloat(document.getElementById('productionAmount').value) || 0;
+            const dateInput = document.getElementById('entryDate');
+            const date = new Date(dateInput.value + 'T00:00:00');
+            const isThursday = date.getDay() === 4;
+            const rate = isThursday ? 0.40 : 0.36;
+            const commission = amount * rate;
+            
+            document.getElementById('commissionPreview').textContent = '$' + commission.toFixed(0);
+            document.getElementById('rateDisplay').textContent = (rate * 100) + '%';
+        }
+
+        function addEntry() {
+            const dateInput = document.getElementById('entryDate').value;
+            const amount = parseFloat(document.getElementById('productionAmount').value);
+            
+            if (!dateInput || !amount || amount <= 0) {
+                alert('Please enter a valid date and production amount');
+                return;
+            }
+            
+            const date = new Date(dateInput + 'T00:00:00');
+            const isThursday = date.getDay() === 4;
+            const rate = isThursday ? 0.40 : 0.36;
+            const commission = amount * rate;
+            
+            const entry = {
+                id: Date.now(),
+                date: dateInput,
+                amount: amount,
+                commission: commission,
+                rate: rate,
+                isThursday: isThursday
+            };
+            
+            entries.unshift(entry);
+            localStorage.setItem('billingEntries', JSON.stringify(entries));
+            
+            document.getElementById('productionAmount').value = '';
+            calculateCommission();
+            updateStats();
+            renderEntries();
+        }
+
+        function deleteEntry(id) {
+            if (confirm('Delete this entry?')) {
+                entries = entries.filter(e => e.id !== id);
+                localStorage.setItem('billingEntries', JSON.stringify(entries));
+                updateStats();
+                renderEntries();
+            }
+        }
+
+        function updateStats() {
+            const today = new Date().toISOString().split('T')[0];
+            const thisWeekStart = getMonday(new Date());
+            const thisMonthStart = new Date();
+            thisMonthStart.setDate(1);
+            
+            let todayTotal = 0, todayCommission = 0;
+            let weekTotal = 0, weekCommission = 0;
+            let monthTotal = 0, monthCommission = 0;
+            
+            entries.forEach(entry => {
+                const entryDate = new Date(entry.date + 'T00:00:00');
+                
+                if (entry.date === today) {
+                    todayTotal += entry.amount;
+                    todayCommission += entry.commission;
+                }
+                
+                if (entryDate >= thisWeekStart) {
+                    weekTotal += entry.amount;
+                    weekCommission += entry.commission;
+                }
+                
+                if (entryDate >= thisMonthStart) {
+                    monthTotal += entry.amount;
+                    monthCommission += entry.commission;
+                }
+            });
+            
+            document.getElementById('todayTotal').textContent = '$' + todayTotal.toFixed(0);
+            document.getElementById('todayCommission').textContent = '$' + todayCommission.toFixed(0) + ' comm.';
+            
+            document.getElementById('weekTotal').textContent = '$' + weekTotal.toFixed(0);
+            document.getElementById('weekCommission').textContent = '$' + weekCommission.toFixed(0) + ' comm.';
+            
+            document.getElementById('monthTotal').textContent = '$' + monthTotal.toFixed(0);
+            document.getElementById('monthCommission').textContent = '$' + monthCommission.toFixed(0) + ' comm.';
+        }
+
+        function renderEntries() {
+            const list = document.getElementById('entriesList');
+            
+            if (entries.length === 0) {
+                list.innerHTML = '<div class="empty-state">No entries yet. Add your first production entry above!</div>';
+                return;
+            }
+            
+            list.innerHTML = entries.slice(0, 10).map(entry => {
+                const date = new Date(entry.date + 'T00:00:00');
+                const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const dayName = days[date.getDay()];
+                const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                
+                return `
+                    <div class="entry-item ${entry.isThursday ? 'thursday' : ''}">
+                        <div>
+                            <div class="entry-date">${formattedDate}</div>
+                            <div class="entry-day">${dayName}</div>
+                        </div>
+                        <div>
+                            <div class="entry-production">$${entry.amount.toFixed(2)}</div>
+                            <div class="entry-commission">${(entry.rate * 100)}% = $${entry.commission.toFixed(2)}</div>
+                        </div>
+                        <button class="delete-btn" onclick="deleteEntry(${entry.id})">Delete</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getMonday(date) {
+            const d = new Date(date);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        }
+    </script>
+</body>
+</html>
