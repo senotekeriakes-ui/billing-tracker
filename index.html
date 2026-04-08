@@ -407,6 +407,7 @@
             const thisWeekStart = getMonday(new Date());
             const thisMonthStart = new Date();
             thisMonthStart.setDate(1);
+            thisMonthStart.setHours(0, 0, 0, 0);
             
             let todayTotal = 0, todayCommission = 0;
             let weekTotal = 0, weekCommission = 0;
@@ -475,7 +476,9 @@
             const d = new Date(date);
             const day = d.getDay();
             const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-            return new Date(d.setDate(diff));
+            d.setDate(diff);
+            d.setHours(0, 0, 0, 0);
+            return d;
         }
     </script>
 </body>
